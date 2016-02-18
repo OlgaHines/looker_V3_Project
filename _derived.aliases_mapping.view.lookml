@@ -80,6 +80,7 @@
               left join realiases r7 on r6.next_alias = r7.alias
               left join realiases r8 on r7.next_alias = r8.alias
               left join realiases r9 on r8.next_alias = r9.alias
+
   fields:
 
   - dimension: alias

@@ -34,7 +34,34 @@
     primary_key: true
     hidden: true
     sql: ${id} || ${universal_visitor_id} || ${event_source}
-  
+            t.event_id
+          , t.sent_at as sent_at
+          , t.event_source
+          , t.event as event
+          , s.session_id
+          , t.looker_visitor_id
+          , t.referrer as referrer
+          , row_number() over(partition by s.session_id order by t.sent_at) as track_sequence_number
+          , row_number() over(partition by s.session_id, t.event_source order by t.sent_at) as source_sequence_number
+          , first_value(t.referrer ignore nulls) over (partition by s.session_id order by t.sent_at rows between unbounded preceding and unbounded following) as first_referrer
+        from ${mapped_events.SQL_TABLE_NAME} as t
+        inner join ${sessions_pg_trk.SQL_TABLE_NAME} as s
+        on t.looker_visitor_id = s.looker_visitor_id
+          and t.sent_at >= s.session_start_at
+          and (t.sent_at < s.next_session_start_at or s.next_session_start_at is null)
+      
+
+  fields:
+
+  - dimension: event_id
+#     hidden: true
+    sql: ${TABLE}.event_id
+    
+  - dimension: pk
+    primary_key: true
+    hidden: true
+    sql: ${event_id} || ${universal_visitor_id} || ${event_source}
+
   - dimension: event
     hidden: true
     sql: ${TABLE}.event

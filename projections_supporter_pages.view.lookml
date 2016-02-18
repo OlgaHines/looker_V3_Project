@@ -100,6 +100,7 @@
     sql: ${TABLE}.url
 
   - dimension: uuid
+    primary_key: true
     type: string
     sql: ${TABLE}.uuid
     
@@ -151,6 +152,15 @@
     decimals: 2
     sql: ${total}
     value_format: "$#,##0.00"
-        
 
+  - measure: count
+    type: count
+    drill_fields: [name]
     
+  - measure: sum
+    type: sum
+    decimals: 2
+    sql: ${TABLE}.total
+    
+
+
